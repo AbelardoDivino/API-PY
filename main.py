@@ -57,7 +57,9 @@ class Api(BaseHTTPRequestHandler):
 
 
 def main():
-    servidor = HTTPServer(("localhost", 8000), Minhaapi)
-    print("Servidor rodando em http://localhost:8000")
-    servidor.serve_forever()
+            servidor = HTTPServer(("localhost", 8000), Api)
+            print("Servidor rodando em http://localhost:8000")
+            servidor.serve_forever()
+        
+if __name__ == "__main__":
     main()
