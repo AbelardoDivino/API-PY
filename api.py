@@ -17,48 +17,54 @@ def proximo_id():
 class Minhaapi(BaseHTTPRequestHandler):
 
     # ================= GET =================
-    def do_GET(self):
+   def do_GET(self):
 
-        if self.path == "/alunos":
+    # lista completa (rota principal)
+    if self.path == "/alunos" or self.path == "/api/alunos":
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(alunos).encode("utf-8"))
+
+    # tamanho da lista
+    elif self.path == "/api/alunos/tamanho":
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+        self.wfile.write(json.dumps(
+            {"total": len(alunos)}
+        ).encode("utf-8"))
+
+    # aluno por id
+    elif self.path.startswith("/api/alunos/"):
+        try:
+            id_aluno = int(self.path.split("/")[-1])
+        except ValueError:
+            # AQUI: se não for número, retorna lista completa
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             self.wfile.write(json.dumps(alunos).encode("utf-8"))
+            return
 
-        elif self.path == "/api/alunos/tamanho":
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.end_headers()
-            self.wfile.write(json.dumps(
-                {"total": len(alunos)}
-            ).encode("utf-8"))
-
-        elif self.path.startswith("/api/alunos/"):
-            try:
-                id_aluno = int(self.path.split("/")[-1])
-            except ValueError:
-                self.send_response(400)
+        for aluno in alunos:
+            if aluno["id"] == id_aluno:
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
                 self.end_headers()
-                self.wfile.write(b"ID invalido")
+                self.wfile.write(json.dumps(aluno).encode("utf-8"))
                 return
 
-            for aluno in alunos:
-                if aluno["id"] == id_aluno:
-                    self.send_response(200)
-                    self.send_header("Content-Type", "application/json")
-                    self.end_headers()
-                    self.wfile.write(json.dumps(aluno).encode("utf-8"))
-                    return
+        self.send_response(404)
+        self.end_headers()
+        self.wfile.write(json.dumps(
+            {"erro": "aluno nao encontrado"}
+        ).encode("utf-8"))
 
-            self.send_response(404)
-            self.end_headers()
-            self.wfile.write(json.dumps(
-                {"erro": "aluno nao encontrado"}
-            ).encode("utf-8"))
+    else:
+        self.send_response(404)
+        self.end_headers()
 
-        else:
-            self.send_response(404)
-            self.end_headers()
 
     # ================= POST =================
     def do_POST(self):
