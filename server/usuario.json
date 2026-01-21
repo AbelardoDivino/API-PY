@@ -1,0 +1,13 @@
+{
+
+
+    "admin": {
+        "passoword": "123",
+        "role": "admin"
+    },
+    "aluno":{
+        "passoword": "123",
+        "role": "user"
+    }
+
+}
